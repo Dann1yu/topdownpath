@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
 
     private float moveSpeed = 5f;
     bool[,] gridChecker = new bool[16, 9];
+    bool[,] gridPortals = new bool[16, 9];
+    bool[,] gridTraps = new bool[16, 9];
     // private Transform movePoint;
 
 
@@ -27,6 +29,8 @@ public class Player : MonoBehaviour
         p1 = Instantiate(_playerPrefab, new Vector3(0,1), Quaternion.identity);
         // movePoint.parent = null;
         createWalls();
+        createPortal();
+        createTrap();
         
         //solution = new int[solutionLength];
         //private Queue<int> myQueue = new Queue<int>();
@@ -36,15 +40,15 @@ public class Player : MonoBehaviour
 
     private void Update() {
 
-        if (myQueue.Count < solutionLength)
-        {
+        
+        
             if (Input.GetKeyDown(KeyCode.UpArrow) && (p1.transform.position.y < 8)) 
         {
             bool test = checkWalls(0,1);
             if (test)
             {
                 p1.transform.Translate(new Vector3(0,1,0));
-                
+
             }
             
         }
@@ -73,15 +77,8 @@ public class Player : MonoBehaviour
             }
         }
 
-        }
-        else
-        {
-            if (!playing)
-            {
-                //PlayerMovement();
-            }
-            
-        }
+        checktraps();
+        
 
 
         // transform.position = Vector3.MoveTowards(transform.position, movePoint.position, moveSpeed * Time.deltaTime);
@@ -119,11 +116,33 @@ public class Player : MonoBehaviour
 
     }
 
+    private void checktraps()
+    {
+        if (gridTraps[(int)p1.transform.position.x, (int)p1.transform.position.y] == true)
+        death();
+    }
+
     private void createWalls()
     {
         gridChecker[3,5] = true;
         gridChecker[4,5] = true;
 
+    }
+
+    private void createPortal()
+    {
+        gridPortals[6,6] = true;
+    }
+
+    private void createTrap()
+    {
+        gridTraps[8,8] = true;
+    }
+
+
+    private void death()
+    {
+        p1.transform.position = new Vector3(0,0,0);
     }
 
 
