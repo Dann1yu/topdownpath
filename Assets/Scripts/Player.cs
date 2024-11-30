@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
     private bool playing = false;
 
     private float moveSpeed = 5f;
+    bool[,] gridChecker = new bool[16, 9];
     // private Transform movePoint;
 
 
@@ -25,7 +26,8 @@ public class Player : MonoBehaviour
     {
         p1 = Instantiate(_playerPrefab, new Vector3(0,1), Quaternion.identity);
         // movePoint.parent = null;
-
+        createWalls();
+        
         //solution = new int[solutionLength];
         //private Queue<int> myQueue = new Queue<int>();
     }
@@ -38,24 +40,37 @@ public class Player : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.UpArrow) && (p1.transform.position.y < 8)) 
         {
-            p1.transform.Translate(new Vector3(0,1,0));
-            myQueue.Enqueue("up");
-            Debug.Log(myQueue.Count);
+            bool test = checkWalls(0,1);
+            if (test)
+            {
+                p1.transform.Translate(new Vector3(0,1,0));
+                
+            }
+            
         }
         if (Input.GetKeyDown(KeyCode.DownArrow) && (p1.transform.position.y > 0)) 
         {
-            p1.transform.Translate(new Vector3(0,-1,0));
-            myQueue.Enqueue("down");
+            bool test = checkWalls(0,-1);
+            if (test)
+            {
+                p1.transform.Translate(new Vector3(0,-1,0));
+            }
         }
         if (Input.GetKeyDown(KeyCode.RightArrow) && (p1.transform.position.x < 15)) 
         {
-            p1.transform.Translate(new Vector3(1,0,0));
-            myQueue.Enqueue("right");
+            bool test = checkWalls(1,0);
+            if (test)
+            {
+                p1.transform.Translate(new Vector3(1,0,0));
+            }
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow) && (p1.transform.position.x > 0)) 
         {
-            p1.transform.Translate(new Vector3(-1,0,0));
-            myQueue.Enqueue("left");
+            bool test = checkWalls(-1,0);
+            if (test)
+            {
+                p1.transform.Translate(new Vector3(-1,0,0));
+            }
         }
 
         }
@@ -67,6 +82,7 @@ public class Player : MonoBehaviour
             }
             
         }
+
 
         // transform.position = Vector3.MoveTowards(transform.position, movePoint.position, moveSpeed * Time.deltaTime);
 
@@ -80,6 +96,37 @@ public class Player : MonoBehaviour
         //     movePoint.position += new Vector3(Input.GetAxisRaw("Vertical"), 0f); 
         // }
     }
+
+
+
+    private bool checkWalls(int x, int y)
+    {
+        for (int i = 0; i < gridChecker.GetLength(0); i++) // Loop through rows
+        {
+            for (int j = 0; j < gridChecker.GetLength(1); j++) // Loop through columns
+            {
+
+
+                if (gridChecker[(int)p1.transform.position.x + x, (int)p1.transform.position.y + y] == true)
+                {
+                    return false;
+                }
+                
+            }
+             
+        }
+        return true;
+
+    }
+
+    private void createWalls()
+    {
+        gridChecker[3,5] = true;
+        gridChecker[4,5] = true;
+
+    }
+
+
 
     // private void PlayerMovement()
     // {
