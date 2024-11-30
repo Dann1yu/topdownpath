@@ -36,23 +36,23 @@ public class Player : MonoBehaviour
 
         if (myQueue.Count < solutionLength)
         {
-            if (Input.GetKeyDown(KeyCode.UpArrow)) 
+            if (Input.GetKeyDown(KeyCode.UpArrow) && (p1.transform.position.y < 8)) 
         {
             p1.transform.Translate(new Vector3(0,1,0));
             myQueue.Enqueue("up");
             Debug.Log(myQueue.Count);
         }
-        if (Input.GetKeyDown(KeyCode.DownArrow)) 
+        if (Input.GetKeyDown(KeyCode.DownArrow) && (p1.transform.position.y > 0)) 
         {
             p1.transform.Translate(new Vector3(0,-1,0));
             myQueue.Enqueue("down");
         }
-        if (Input.GetKeyDown(KeyCode.RightArrow)) 
+        if (Input.GetKeyDown(KeyCode.RightArrow) && (p1.transform.position.x < 15)) 
         {
             p1.transform.Translate(new Vector3(1,0,0));
             myQueue.Enqueue("right");
         }
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) 
+        if (Input.GetKeyDown(KeyCode.LeftArrow) && (p1.transform.position.x > 0)) 
         {
             p1.transform.Translate(new Vector3(-1,0,0));
             myQueue.Enqueue("left");
