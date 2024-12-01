@@ -24,10 +24,12 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject _key;
     [SerializeField] private GameObject _doorClosed;
     [SerializeField] private GameObject _doorOpen;
+    [SerializeField] private GameObject _traps;
 
      Color currentColor = new Color();
     //private Queue solution;
     private GameObject p1;
+    private GameObject trap;
     private Queue<string> myQueue = new Queue<string>();
     private bool playing = false;
     private GameObject jimmy;
@@ -57,6 +59,7 @@ public class Player : MonoBehaviour
         createWalls();
         createPortal();
         createTrap();
+        spawnTraps();
         
         //solution = new int[solutionLength];
         //private Queue<int> myQueue = new Queue<int>();
@@ -136,6 +139,7 @@ public class Player : MonoBehaviour
             checktraps();
             checkportals();
             checkDoor();
+            checkKey();
             cooldown = false;
         }
 
@@ -177,6 +181,15 @@ public class Player : MonoBehaviour
     {
         if (gridTraps[(int)p1.transform.position.x, (int)p1.transform.position.y] == true)
         {
+            trap = GameObject.Find("Trap " + ((int)p1.transform.position.x) + " " + ((int)p1.transform.position.y));
+           
+            Color currentColor = trap.GetComponent<SpriteRenderer>().color;
+
+            // Modify the alpha component
+            currentColor.a = 1f; // alpha values are between 0 (fully transparent) and 1 (fully opaque)
+
+            // Set the color back
+            trap.GetComponent<SpriteRenderer>().color = currentColor;
             death();
         }
         
@@ -192,7 +205,7 @@ public class Player : MonoBehaviour
             teleport();
             x = (int)p1.transform.position.x;
             y = (int)p1.transform.position.y;
-            portal = Instantiate(_portal, new Vector3(x,y), Quaternion.identity);
+            //portal = Instantiate(_portal, new Vector3(x,y), Quaternion.identity);
         }
         
     }
@@ -203,7 +216,7 @@ public class Player : MonoBehaviour
         int y = (int)p1.transform.position.y;
         if (x == 4 && y == 4)
         {
-            locked = !locked;
+            locked = false;
             Destroy(key);
         }
     }
@@ -322,18 +335,36 @@ public class Player : MonoBehaviour
         gridTraps[4,0] = true;
     }
 
+    private void spawnTraps()
+    {
+         for (int i = 0; i < gridTraps.GetLength(0); i++) // Loop through rows
+        {
+            for (int j = 0; j < gridTraps.GetLength(1); j++) // Loop through columns
+            {
+                if (gridTraps[i,j] == true)
+                {
+                   trap = Instantiate(_traps, new Vector3(i,j), Quaternion.identity);
+                   trap.name = $"Trap {i} {j}";
+                }
+                
+            }
+             
+        }
+    }
+
     private void checkDoor()
     {
         int x = (int)p1.transform.position.x;
         int y = (int)p1.transform.position.y;
-        if ((gridDoor[(int)p1.transform.position.x, (int)p1.transform.position.y] == true) && (locked))
+        if ((gridDoor[x,y] == true) && (!locked))
         {
             door = Instantiate(_doorClosed, new Vector3(15,0), Quaternion.identity);
         }
-        else if ((gridDoor[(int)p1.transform.position.x, (int)p1.transform.position.y] == true) && (!locked))
+        else
         {
-            door = Instantiate(_doorClosed, new Vector3(15,0), Quaternion.identity);
+            door = Instantiate(_doorOpen, new Vector3(15,0), Quaternion.identity);
         }
+       
         
     }
 
