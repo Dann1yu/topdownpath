@@ -12,7 +12,12 @@ public class Player : MonoBehaviour
     [SerializeField] private Sprite _playerLeft;
     [SerializeField] private Sprite _playerRight;
     [SerializeField] private Sprite _playerVert;
-    [SerializeField] private Sprite wall;
+    // [SerializeField] private Sprite wall;
+    [SerializeField] private Sprite _wallUp;
+    [SerializeField] private Sprite _wallDown;
+    [SerializeField] private Sprite _wallLeft;
+    [SerializeField] private Sprite _wallRight;
+    [SerializeField] private GameObject _defaultWall;
     [SerializeField] private int solutionLength = 10;
     [SerializeField] private Tile _tilePrefab;
     //private Queue solution;
@@ -20,7 +25,7 @@ public class Player : MonoBehaviour
     private Queue<string> myQueue = new Queue<string>();
     private bool playing = false;
     private GameObject jimmy;
-    private GameObject tim;
+    private GameObject wall;
     private float moveSpeed = 5f;
     bool[,] gridChecker = new bool[16, 9];
     bool[,] gridPortals = new bool[16, 9];
@@ -45,10 +50,7 @@ public class Player : MonoBehaviour
     
 
     private void Update() {
-
-        
-        
-            if (Input.GetKeyDown(KeyCode.UpArrow) && (p1.transform.position.y < 8)) 
+        if (Input.GetKeyDown(KeyCode.UpArrow) && (p1.transform.position.y < 8)) 
         {
             bool test = checkWalls(0,1);
             if (test)
@@ -56,7 +58,10 @@ public class Player : MonoBehaviour
                 p1.GetComponent<SpriteRenderer>().sprite = _playerVert;
                 p1.transform.Translate(new Vector3(0,1,0));
             }
-            
+            else 
+            {
+                wallAdder("up");
+            }
         }
         if (Input.GetKeyDown(KeyCode.DownArrow) && (p1.transform.position.y > 0)) 
         {
@@ -65,6 +70,10 @@ public class Player : MonoBehaviour
             {
                 p1.GetComponent<SpriteRenderer>().sprite = _playerVert;
                 p1.transform.Translate(new Vector3(0,-1,0));
+            }
+            else 
+            {
+                wallAdder("down");
             }
         }
         if (Input.GetKeyDown(KeyCode.RightArrow) && (p1.transform.position.x < 15)) 
@@ -75,6 +84,10 @@ public class Player : MonoBehaviour
                 p1.GetComponent<SpriteRenderer>().sprite = _playerRight;
                 p1.transform.Translate(new Vector3(1,0,0));
             }
+            else 
+            {
+                wallAdder("right");
+            }
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow) && (p1.transform.position.x > 0)) 
         {
@@ -84,9 +97,16 @@ public class Player : MonoBehaviour
                 p1.GetComponent<SpriteRenderer>().sprite = _playerLeft;
                 p1.transform.Translate(new Vector3(-1,0,0));
             }
+            else 
+            {
+                wallAdder("left");
+            }
         }
+        
+
         darkness();
         checktraps();
+        
         
         
 
@@ -112,8 +132,6 @@ public class Player : MonoBehaviour
         {
             for (int j = 0; j < gridChecker.GetLength(1); j++) // Loop through columns
             {
-
-
                 if (gridChecker[(int)p1.transform.position.x + x, (int)p1.transform.position.y + y] == true)
                 {
                     return false;
@@ -136,12 +154,6 @@ public class Player : MonoBehaviour
     {
         gridChecker[3,5] = true;
         gridChecker[4,5] = true;
-
-        tim = GameObject.Find("Tile " + 3 + " "+ 5);
-        //tim.GetComponent<SpriteRenderer>().sprite = wall;
-        
-
-
     }
 
     private void createPortal()
@@ -165,15 +177,51 @@ public class Player : MonoBehaviour
         int x = (int)p1.transform.position.x;
         int y = (int)p1.transform.position.y;
 
-        jimmy = GameObject.Find("Tile " + x + " "+ y);
+        jimmy = GameObject.Find("Tile " + x + " " + y);
         // Get the current color
         Color currentColor = jimmy.GetComponent<SpriteRenderer>().color;
 
-    // Modify the alpha component
-    currentColor.a = 1f; // alpha values are between 0 (fully transparent) and 1 (fully opaque)
+        // Modify the alpha component
+        currentColor.a = 1f; // alpha values are between 0 (fully transparent) and 1 (fully opaque)
 
-    // Set the color back
-    jimmy.GetComponent<SpriteRenderer>().color = currentColor;
+        // Set the color back
+        jimmy.GetComponent<SpriteRenderer>().color = currentColor;
+
+    }
+
+    private void wallAdder(string direction)
+    {
+        int x = (int)p1.transform.position.x;
+        int y = (int)p1.transform.position.y;
+
+        switch(direction)
+        {
+            case "up":
+                wall = GameObject.Find("Tile " + x + " " + y);
+                wall.GetComponent<SpriteRenderer>().sprite = _wallUp;
+                wall.transform.position = new Vector3(x,(float)(y+0.7f),0);
+                break;
+            
+            case "down":
+                wall = GameObject.Find("Tile " + x + " " + y);
+                wall.GetComponent<SpriteRenderer>().sprite = _wallDown;
+                wall.transform.position = new Vector3(x,(float)(y-0.7f),0);
+                break;
+
+            case "left":
+                wall = GameObject.Find("Tile " + x + " " + y);
+                wall.GetComponent<SpriteRenderer>().sprite = _wallLeft;
+                wall.transform.position = new Vector3((float)(x-0.5f),y,0);
+                wall.transform.rotation = Quaternion.Euler(0, 0, 90);
+                break;
+            
+            case "right":
+                wall = GameObject.Find("Tile " + x + " " + y);
+                wall.GetComponent<SpriteRenderer>().sprite = _wallRight;
+                wall.transform.position = new Vector3((float)(x+0.5f),y,0);
+                wall.transform.rotation = Quaternion.Euler(0, 0, 90);
+                break;
+        }
 
     }
 
