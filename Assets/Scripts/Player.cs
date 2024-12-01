@@ -24,6 +24,8 @@ public class Player : MonoBehaviour
     [SerializeField] private GameObject _key;
     [SerializeField] private GameObject _doorClosed;
     [SerializeField] private GameObject _doorOpen;
+
+     Color currentColor = new Color();
     //private Queue solution;
     private GameObject p1;
     private Queue<string> myQueue = new Queue<string>();
@@ -31,8 +33,13 @@ public class Player : MonoBehaviour
     private GameObject jimmy;
     private GameObject wall;
     private GameObject endGame;
+    private GameObject portal;
     private GameObject key;
+    [SerializeField] private GameObject _portal;
     private GameObject door;
+
+    private bool cooldown = false;
+
     private float moveSpeed = 5f;
     bool[,] gridChecker = new bool[16, 9];
     bool[,] gridPortals = new bool[16, 9];
@@ -77,6 +84,7 @@ public class Player : MonoBehaviour
                 else 
                 {
                     wallAdder("up");
+                    darkness(0,1);
                 }
             }
             if (Input.GetKeyDown(KeyCode.DownArrow) && (p1.transform.position.y > 0)) 
@@ -91,6 +99,7 @@ public class Player : MonoBehaviour
                 else 
                 {
                     wallAdder("down");
+                    darkness(0,-1);
                 }
             }
             if (Input.GetKeyDown(KeyCode.RightArrow) && (p1.transform.position.x < 15)) 
@@ -105,6 +114,7 @@ public class Player : MonoBehaviour
                 else 
                 {
                     wallAdder("right");
+                    darkness(1,0);
                 }
             }
             if (Input.GetKeyDown(KeyCode.LeftArrow) && (p1.transform.position.x > 0)) 
@@ -119,12 +129,14 @@ public class Player : MonoBehaviour
                 else 
                 {
                     wallAdder("left");
+                    darkness(-1,0);
                 }
             }
-            darkness();
+            darkness(0,0);
             checktraps();
             checkportals();
             checkDoor();
+            cooldown = false;
         }
 
 
@@ -172,9 +184,15 @@ public class Player : MonoBehaviour
 
     private void checkportals()
     {
-        if (gridPortals[(int)p1.transform.position.x, (int)p1.transform.position.y] == true)
+        int x = (int)p1.transform.position.x;
+        int y = (int)p1.transform.position.y;
+        if (gridPortals[x, y] == true)
         {
+            portal = Instantiate(_portal, new Vector3(x,y), Quaternion.identity);
             teleport();
+            x = (int)p1.transform.position.x;
+            y = (int)p1.transform.position.y;
+            portal = Instantiate(_portal, new Vector3(x,y), Quaternion.identity);
         }
         
     }
@@ -308,11 +326,11 @@ public class Player : MonoBehaviour
     {
         int x = (int)p1.transform.position.x;
         int y = (int)p1.transform.position.y;
-        if ((gridPortals[(int)p1.transform.position.x, (int)p1.transform.position.y] == true) && (locked))
+        if ((gridDoor[(int)p1.transform.position.x, (int)p1.transform.position.y] == true) && (locked))
         {
             door = Instantiate(_doorClosed, new Vector3(15,0), Quaternion.identity);
         }
-        else if ((gridPortals[(int)p1.transform.position.x, (int)p1.transform.position.y] == true) && (!locked))
+        else if ((gridDoor[(int)p1.transform.position.x, (int)p1.transform.position.y] == true) && (!locked))
         {
             door = Instantiate(_doorClosed, new Vector3(15,0), Quaternion.identity);
         }
@@ -332,34 +350,44 @@ public class Player : MonoBehaviour
 
     private void teleport()
     {
+        
         int x = (int)p1.transform.position.x;
         int y = (int)p1.transform.position.y;
-        if (x == 0 && y == 8) 
+
+        if (!cooldown)
+        {
+             if (x == 0 && y == 8) 
         {
             p1.transform.position = new Vector3(5,4,0);
             key = Instantiate(_key, new Vector3(4,4), Quaternion.identity);
+            cooldown = true;
         } 
         else if (x == 6 && y == 4) 
         {
             p1.transform.position = new Vector3(1,8,0);
+            cooldown = true;
         }
         else if (x == 8 && y == 0)
         {
             p1.transform.position = new Vector3(12,5,0);
+            cooldown = true;
         }
         else if (x == 12 && y == 4)
         {
             p1.transform.position = new Vector3(9,0,0);
+            cooldown = true;
         }
+        }
+       
         
     }
 
-    private void darkness()
+    private void darkness(int a, int b)
     {
         int x = (int)p1.transform.position.x;
         int y = (int)p1.transform.position.y;
 
-        jimmy = GameObject.Find("Tile " + x + " " + y);
+        jimmy = GameObject.Find("Tile " + (x+a) + " " + (y+b));
         // Get the current color
         Color currentColor = jimmy.GetComponent<SpriteRenderer>().color;
 
@@ -378,30 +406,39 @@ public class Player : MonoBehaviour
 
         switch(direction)
         {
+           
+
             case "up":
-                wall = GameObject.Find("Tile " + x + " " + y);
-                wall.GetComponent<SpriteRenderer>().sprite = _wallUp;
-                wall.transform.position = new Vector3(x,(float)(y+0.7f),0);
+                wall = GameObject.Find("Tile " + x + " " + (y+1)); 
+                currentColor = wall.GetComponent<SpriteRenderer>().color;
+                currentColor.b = 1f;
+                currentColor.r = 0.5f;
+                wall.GetComponent<SpriteRenderer>().color = currentColor;
                 break;
             
             case "down":
-                wall = GameObject.Find("Tile " + x + " " + y);
-                wall.GetComponent<SpriteRenderer>().sprite = _wallDown;
-                wall.transform.position = new Vector3(x,(float)(y-0.7f),0);
+                wall = GameObject.Find("Tile " + x + " " + (y-1));
+                currentColor = wall.GetComponent<SpriteRenderer>().color;
+                currentColor.b = 1f;
+                currentColor.r = 0.5f;
+                wall.GetComponent<SpriteRenderer>().color = currentColor;
                 break;
 
             case "left":
-                wall = GameObject.Find("Tile " + x + " " + y);
-                wall.GetComponent<SpriteRenderer>().sprite = _wallLeft;
-                wall.transform.position = new Vector3((float)(x-0.5f),y,0);
-                wall.transform.rotation = Quaternion.Euler(0, 0, 90);
+                wall = GameObject.Find("Tile " + (x-1) + " " + y);
+                currentColor = wall.GetComponent<SpriteRenderer>().color;
+                currentColor.b = 1f;
+                currentColor.r = 0.5f;
+                wall.GetComponent<SpriteRenderer>().color = currentColor;
                 break;
             
             case "right":
-                wall = GameObject.Find("Tile " + x + " " + y);
-                wall.GetComponent<SpriteRenderer>().sprite = _wallRight;
-                wall.transform.position = new Vector3((float)(x+0.5f),y,0);
-                wall.transform.rotation = Quaternion.Euler(0, 0, 90);
+                wall = GameObject.Find("Tile " + (x+1) + " " + y);
+                currentColor = wall.GetComponent<SpriteRenderer>().color;
+                currentColor.b = 1f;
+                currentColor.r = 0.5f;
+                wall.GetComponent<SpriteRenderer>().color = currentColor;
+                //wall.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                 break;
         }
 
