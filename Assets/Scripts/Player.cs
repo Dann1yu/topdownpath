@@ -13,11 +13,12 @@ public class Player : MonoBehaviour
     [SerializeField] private Sprite _playerRight;
     [SerializeField] private Sprite _playerVert;
     [SerializeField] private int solutionLength = 10;
+    [SerializeField] private Tile _tilePrefab;
     //private Queue solution;
     private GameObject p1;
     private Queue<string> myQueue = new Queue<string>();
     private bool playing = false;
-
+    private GameObject jimmy;
     private float moveSpeed = 5f;
     bool[,] gridChecker = new bool[16, 9];
     bool[,] gridPortals = new bool[16, 9];
@@ -82,8 +83,9 @@ public class Player : MonoBehaviour
                 p1.transform.Translate(new Vector3(-1,0,0));
             }
         }
-
+        darkness();
         checktraps();
+        
         
 
 
@@ -149,6 +151,23 @@ public class Player : MonoBehaviour
     private void death()
     {
         p1.transform.position = new Vector3(0,0,0);
+    }
+
+    private void darkness()
+    {
+        int x = (int)p1.transform.position.x;
+        int y = (int)p1.transform.position.y;
+
+        jimmy = GameObject.Find("Tile " + x + " "+ y);
+        // Get the current color
+    Color currentColor = jimmy.GetComponent<SpriteRenderer>().color;
+
+    // Modify the alpha component
+    currentColor.a = 1f; // alpha values are between 0 (fully transparent) and 1 (fully opaque)
+
+    // Set the color back
+    jimmy.GetComponent<SpriteRenderer>().color = currentColor;
+
     }
 
 
