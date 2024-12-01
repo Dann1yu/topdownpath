@@ -21,6 +21,9 @@ public class Player : MonoBehaviour
     [SerializeField] private int solutionLength = 60;
     [SerializeField] private Tile _tilePrefab;
     [SerializeField] private GameObject _gameOver;
+    [SerializeField] private GameObject _key;
+    [SerializeField] private GameObject _doorClosed;
+    [SerializeField] private GameObject _doorOpen;
     //private Queue solution;
     private GameObject p1;
     private Queue<string> myQueue = new Queue<string>();
@@ -28,12 +31,16 @@ public class Player : MonoBehaviour
     private GameObject jimmy;
     private GameObject wall;
     private GameObject endGame;
+    private GameObject key;
+    private GameObject door;
     private float moveSpeed = 5f;
     bool[,] gridChecker = new bool[16, 9];
     bool[,] gridPortals = new bool[16, 9];
     bool[,] gridTraps = new bool[16, 9];
+    bool[,] gridDoor = new bool[16, 9];
 
     private bool gameEnded = false;
+    private bool locked = true;
 
 
     void Start()
@@ -116,7 +123,8 @@ public class Player : MonoBehaviour
             }
             darkness();
             checktraps();
-            checkportal();
+            checkportals();
+            checkDoor();
         }
 
 
@@ -162,13 +170,24 @@ public class Player : MonoBehaviour
         
     }
 
-    private void checkportal()
+    private void checkportals()
     {
         if (gridPortals[(int)p1.transform.position.x, (int)p1.transform.position.y] == true)
         {
             teleport();
         }
         
+    }
+
+    private void checkKey()
+    {
+        int x = (int)p1.transform.position.x;
+        int y = (int)p1.transform.position.y;
+        if (x == 4 && y == 4)
+        {
+            locked = !locked;
+            Destroy(key);
+        }
     }
 
     private void createWalls()
@@ -285,6 +304,26 @@ public class Player : MonoBehaviour
         gridTraps[4,0] = true;
     }
 
+    private void checkDoor()
+    {
+        int x = (int)p1.transform.position.x;
+        int y = (int)p1.transform.position.y;
+        if ((gridPortals[(int)p1.transform.position.x, (int)p1.transform.position.y] == true) && (locked))
+        {
+            door = Instantiate(_doorClosed, new Vector3(15,0), Quaternion.identity);
+        }
+        else if ((gridPortals[(int)p1.transform.position.x, (int)p1.transform.position.y] == true) && (!locked))
+        {
+            door = Instantiate(_doorClosed, new Vector3(15,0), Quaternion.identity);
+        }
+        
+    }
+
+    private void createDoor()
+    {
+        gridDoor[15,0] = true;
+    }
+
 
     private void death()
     {
@@ -298,6 +337,7 @@ public class Player : MonoBehaviour
         if (x == 0 && y == 8) 
         {
             p1.transform.position = new Vector3(5,4,0);
+            key = Instantiate(_key, new Vector3(4,4), Quaternion.identity);
         } 
         else if (x == 6 && y == 4) 
         {
