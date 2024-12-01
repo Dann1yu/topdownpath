@@ -7,9 +7,11 @@ public class Player : MonoBehaviour
 {
 
     [SerializeField] private SpriteRenderer _renderer;
-
     [SerializeField] private GameObject _playerPrefab;
     [SerializeField] private GameObject _lazerPrefab;
+    [SerializeField] private Sprite _playerLeft;
+    [SerializeField] private Sprite _playerRight;
+    [SerializeField] private Sprite _playerVert;
     [SerializeField] private int solutionLength = 10;
     //private Queue solution;
     private GameObject p1;
@@ -20,7 +22,8 @@ public class Player : MonoBehaviour
     bool[,] gridChecker = new bool[16, 9];
     bool[,] gridPortals = new bool[16, 9];
     bool[,] gridTraps = new bool[16, 9];
-    // private Transform movePoint;
+
+
 
 
 
@@ -47,8 +50,8 @@ public class Player : MonoBehaviour
             bool test = checkWalls(0,1);
             if (test)
             {
+                p1.GetComponent<SpriteRenderer>().sprite = _playerVert;
                 p1.transform.Translate(new Vector3(0,1,0));
-
             }
             
         }
@@ -57,6 +60,7 @@ public class Player : MonoBehaviour
             bool test = checkWalls(0,-1);
             if (test)
             {
+                p1.GetComponent<SpriteRenderer>().sprite = _playerVert;
                 p1.transform.Translate(new Vector3(0,-1,0));
             }
         }
@@ -65,14 +69,16 @@ public class Player : MonoBehaviour
             bool test = checkWalls(1,0);
             if (test)
             {
+                p1.GetComponent<SpriteRenderer>().sprite = _playerRight;
                 p1.transform.Translate(new Vector3(1,0,0));
             }
         }
         if (Input.GetKeyDown(KeyCode.LeftArrow) && (p1.transform.position.x > 0)) 
         {
-            bool test = checkWalls(-1,0);
+            bool test = checkWalls(-1,0);  
             if (test)
             {
+                p1.GetComponent<SpriteRenderer>().sprite = _playerLeft;
                 p1.transform.Translate(new Vector3(-1,0,0));
             }
         }
