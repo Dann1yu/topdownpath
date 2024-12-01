@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     [SerializeField] private Sprite _playerLeft;
     [SerializeField] private Sprite _playerRight;
     [SerializeField] private Sprite _playerVert;
+    [SerializeField] private Sprite wall;
     [SerializeField] private int solutionLength = 10;
     [SerializeField] private Tile _tilePrefab;
     //private Queue solution;
@@ -19,6 +20,7 @@ public class Player : MonoBehaviour
     private Queue<string> myQueue = new Queue<string>();
     private bool playing = false;
     private GameObject jimmy;
+    private GameObject tim;
     private float moveSpeed = 5f;
     bool[,] gridChecker = new bool[16, 9];
     bool[,] gridPortals = new bool[16, 9];
@@ -135,6 +137,11 @@ public class Player : MonoBehaviour
         gridChecker[3,5] = true;
         gridChecker[4,5] = true;
 
+        tim = GameObject.Find("Tile " + 3 + " "+ 5);
+        //tim.GetComponent<SpriteRenderer>().sprite = wall;
+        
+
+
     }
 
     private void createPortal()
@@ -160,7 +167,7 @@ public class Player : MonoBehaviour
 
         jimmy = GameObject.Find("Tile " + x + " "+ y);
         // Get the current color
-    Color currentColor = jimmy.GetComponent<SpriteRenderer>().color;
+        Color currentColor = jimmy.GetComponent<SpriteRenderer>().color;
 
     // Modify the alpha component
     currentColor.a = 1f; // alpha values are between 0 (fully transparent) and 1 (fully opaque)
